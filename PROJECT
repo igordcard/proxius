@@ -20,4 +20,7 @@ resources:
   kind: ProxyDef
   path: github.com/igordcard/proxius/api/v1
   version: v1
+  webhooks:
+    defaulting: true
+    webhookVersion: v1
 version: "3"
