@@ -19,11 +19,11 @@ package v1
 import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	webhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
 // log is for logging in this package.
-var proxydeflog = logf.Log.WithName("proxydef-resource")
+var proxydeflog = logf.Log.WithName("proxius-proxydefs")
 
 // SetupWebhookWithManager will setup the manager to manage the webhooks
 func (r *ProxyDef) SetupWebhookWithManager(mgr ctrl.Manager) error {
