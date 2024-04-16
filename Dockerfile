@@ -2,6 +2,9 @@
 FROM golang:1.20 AS builder
 ARG TARGETOS
 ARG TARGETARCH
+ARG http_proxy=http://proxy-us.intel.com:912
+ARG https_proxy=http://proxy-us.intel.com:912
+ARG no_proxy=intel.com
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
