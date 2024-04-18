@@ -25,11 +25,21 @@ import (
 
 // ProxyDefSpec defines the desired state of ProxyDef
 type ProxyDefSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	HTTPProxy  string `json:"httpProxy,omitempty"`
+	HTTPSProxy string `json:"httpsProxy,omitempty"`
+	NoProxy    string `json:"noProxy,omitempty"`
 
-	// Foo is an example field of ProxyDef. Edit proxydef_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// TODO: Not implemented yet
+	NoProxyCIDRs  string `json:"noProxyCidrs,omitempty"`
+	SocksProxy    string `json:"socksProxy,omitempty"`
+	FTPProxy      string `json:"ftpProxy,omitempty"`
+	ProxyUser     string `json:"proxyUser,omitempty"`
+	ProxyPassword string `json:"proxyPassword,omitempty"`
+	ProxyProtocol string `json:"proxyProtocol,omitempty"`
+	ProxyPort     int    `json:"proxyPort,omitempty"`
+	NonProxyHosts string `json:"nonProxyHosts,omitempty"`
+	AutoDetect    bool   `json:"autoDetect,omitempty"`
 }
 
 // ProxyDefStatus defines the observed state of ProxyDef
