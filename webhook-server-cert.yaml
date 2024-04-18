@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: webhook-server-cert
+  namespace: proxius-system
+spec:
+  secretName: webhook-server-cert
+  duration: 87600h # 10y
+  renewBefore: 360h # 15d
+  issuerRef:
+    name: selfsigned-issuer
+    kind: ClusterIssuer
+  commonName: webhook-service.default.svc
+  dnsNames:
+  - webhook-service.default.svc.cluster.local
+  - webhook-service.default.svc
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
