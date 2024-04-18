@@ -21,6 +21,7 @@ import (
 
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -70,7 +71,7 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	// Let's just set the status as Unknown when no status are available
 	if proxydef.Status.Conditions == nil || len(proxydef.Status.Conditions) == 0 {
-		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeAvailableproxydef, Status: metav1.ConditionUnknown, Reason: "Reconciling", Message: "Starting reconciliation"})
+		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeSyncingProxyDef, Status: metav1.ConditionUnknown, Reason: "Reconciling", Message: "Starting reconciliation"})
 		if err = r.Status().Update(ctx, proxydef); err != nil {
 			log.Error(err, "Failed to update proxydef status")
 			return ctrl.Result{}, err
@@ -78,8 +79,8 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 		// Let's re-fetch the proxydef Custom Resource after update the status
 		// so that we have the latest state of the resource on the cluster and we will avoid
-		// raise the issue "the object has been modified, please apply
-		// your changes to the latest version and try again" which would re-trigger the reconciliation
+		// raising the issue "the object has been modified, please apply your changes to
+		// the latest version and try again" which would re-trigger the reconciliation
 		// if we try to update it again in the following operations
 		if err := r.Get(ctx, req.NamespacedName, proxydef); err != nil {
 			log.Error(err, "Failed to re-fetch proxydef")
@@ -89,6 +90,16 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	return ctrl.Result{}, nil
 }
+
+// Definitions to manage status conditions
+const (
+	// typeReadyProxyDef represents that the ProxyDef has already generated the respective ConfigMap
+	typeReadyProxyDef = "Ready"
+	// typeSyncingProxyDef represents that the ProxyDef is in the progress of generating a ConfigMap
+	typeSyncingProxyDef = "Syncing"
+	// typeDegradedProxyDef represents that a failure has occurred preventing a ConfigMap from being generated
+	typeDegradedProxyDef = "Degraded"
+)
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *ProxyDefReconciler) SetupWithManager(mgr ctrl.Manager) error {

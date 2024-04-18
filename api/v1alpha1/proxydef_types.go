@@ -46,7 +46,7 @@ type ProxyDefSpec struct {
 // ProxyDefStatus defines the observed state of ProxyDef
 type ProxyDefStatus struct {
 	// Represents the observations of a ProxyDef's current state.
-	// ProxyDef.status.conditions.type are: "Available", "Progressing", and "Degraded"
+	// ProxyDef.status.conditions.type are: "Ready", "Syncing", and "Degraded"
 	// ProxyDef.status.conditions.status are one of True, False, Unknown.
 	// ProxyDef.status.conditions.reason the value should be a CamelCase string and producers of specific
 	// condition types may define expected values and meanings for this field, and whether the values
