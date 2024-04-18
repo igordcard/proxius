@@ -143,7 +143,7 @@ lint-fix: golangci-lint ## Run golangci-lint linter and perform fixes
 
 .PHONY: build
 build: manifests generate fmt vet ## Build manager binary.
-	go build -o bin/manager cmd/main.go
+	go build -o bin/manager cmd/main.go cmd/webhook.go
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
