@@ -19,11 +19,19 @@
 make docker-build docker-push IMG=<some-registry>/proxius:tag
 ```
 
+Examples:
+```sh
+make docker-build docker-push
+make docker-build docker-push IMG=localhost:5000/proxius:v0.1.0
+```
+
 **NOTE:** This image ought to be published in the personal registry you specified. 
 And it is required to have access to pull the image from the working environment. 
 Make sure you have the proper permission to the registry if the above commands don’t work.
 
 **Install the CRDs into the cluster:**
+
+(optional, you can skip to the next section)
 
 ```sh
 make install
@@ -33,6 +41,11 @@ make install
 
 ```sh
 make deploy IMG=<some-registry>/proxius:tag
+```
+
+Example:
+```sh
+make deploy IMG=172.17.0.1:5000/proxius:v0.1.0
 ```
 
 > **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin 
