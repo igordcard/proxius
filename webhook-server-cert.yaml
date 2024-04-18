@@ -10,10 +10,11 @@ spec:
   issuerRef:
     name: selfsigned-issuer
     kind: ClusterIssuer
-  commonName: webhook-service.default.svc
+  commonName: proxius-webhook-service.proxius-system.svc
   dnsNames:
   - webhook-service.default.svc.cluster.local
   - webhook-service.default.svc
+  - proxius-webhook-service.proxius-system.svc
   privateKey:
     algorithm: RSA
     encoding: PKCS1
