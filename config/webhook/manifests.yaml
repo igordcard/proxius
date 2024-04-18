@@ -7,9 +7,10 @@ webhooks:
 - admissionReviewVersions:
   - v1
   clientConfig:
+    caBundle: ""
     service:
       name: proxius-webhook-service
-      namespace: system
+      namespace: proxius-system
       path: /mutate-webhooks-igordc-com-v1-proxydef
   failurePolicy: Fail
   name: mproxydef.kb.io

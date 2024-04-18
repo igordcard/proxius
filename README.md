@@ -48,6 +48,11 @@ kubectl apply -k config/samples/
 
 >**NOTE**: Ensure that the samples has default values to test it out.
 
+You might need to edit `config/webhook/manifests.yaml` to set the service name and namespace correctly. You can also add/remove `caBundle: ""` under `clientConfig` to enable/disable checking the CA. Then:
+```sh
+kubectl apply -f config/webhook/manifests.yaml
+```
+
 ### To Uninstall
 **Delete the instances (CRs) from the cluster:**
 
