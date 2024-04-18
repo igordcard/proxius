@@ -10,4 +10,14 @@ plugins:
   scorecard.sdk.operatorframework.io/v2: {}
 projectName: proxius
 repo: github.com/igordcard/proxius
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: igordc.com
+  group: proxy
+  kind: ProxyDef
+  path: github.com/igordcard/proxius/api/v1alpha1
+  version: v1alpha1
 version: "3"

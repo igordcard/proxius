@@ -1,0 +1,27 @@
+# permissions for end users to view proxydefs.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: proxydef-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: proxius
+    app.kubernetes.io/part-of: proxius
+    app.kubernetes.io/managed-by: kustomize
+  name: proxydef-viewer-role
+rules:
+- apiGroups:
+  - proxy.igordc.com
+  resources:
+  - proxydefs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - proxy.igordc.com
+  resources:
+  - proxydefs/status
+  verbs:
+  - get

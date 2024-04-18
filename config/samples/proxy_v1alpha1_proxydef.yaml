@@ -1,0 +1,12 @@
+apiVersion: proxy.igordc.com/v1alpha1
+kind: ProxyDef
+metadata:
+  labels:
+    app.kubernetes.io/name: proxydef
+    app.kubernetes.io/instance: proxydef-sample
+    app.kubernetes.io/part-of: proxius
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: proxius
+  name: proxydef-sample
+spec:
+  # TODO(user): Add fields here
