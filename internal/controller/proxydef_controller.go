@@ -1,5 +1,5 @@
 /*
-Copyright 2024.
+Copyright 2024 Igor DC.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -54,6 +54,8 @@ type ProxyDefReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
+
+	log.Info("proxydef resource request detected")
 
 	proxydef := &v1alpha1.ProxyDef{}
 	err := r.Get(ctx, req.NamespacedName, proxydef)
