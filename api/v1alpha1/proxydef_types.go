@@ -23,9 +23,10 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// Important: Run "make" to regenerate code after modifying this file
+
 // ProxyDefSpec defines the desired state of ProxyDef
 type ProxyDefSpec struct {
-	// Important: Run "make" to regenerate code after modifying this file
 	HTTPProxy  string `json:"httpProxy,omitempty"`
 	HTTPSProxy string `json:"httpsProxy,omitempty"`
 	NoProxy    string `json:"noProxy,omitempty"`
@@ -44,8 +45,18 @@ type ProxyDefSpec struct {
 
 // ProxyDefStatus defines the observed state of ProxyDef
 type ProxyDefStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Represents the observations of a ProxyDef's current state.
+	// ProxyDef.status.conditions.type are: "Available", "Progressing", and "Degraded"
+	// ProxyDef.status.conditions.status are one of True, False, Unknown.
+	// ProxyDef.status.conditions.reason the value should be a CamelCase string and producers of specific
+	// condition types may define expected values and meanings for this field, and whether the values
+	// are considered a guaranteed API.
+	// ProxyDef.status.conditions.Message is a human readable message indicating details about the transition.
+	// For further information see: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties
+
+	// Conditions store the status conditions of the ProxyDef instances
+	// +operator-sdk:csv:customresourcedefinitions:type=status
+	Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
 }
 
 //+kubebuilder:object:root=true

@@ -19,13 +19,15 @@ package controller
 import (
 	"context"
 
-	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
+	"github.com/igordcard/proxius/api/v1alpha1"
 	proxyv1alpha1 "github.com/igordcard/proxius/api/v1alpha1"
 )
 
@@ -50,9 +52,40 @@ type ProxyDefReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.3/pkg/reconcile
 func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	proxydef := &v1alpha1.ProxyDef{}
+	err := r.Get(ctx, req.NamespacedName, proxydef)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			// If the custom resource is not found then, it usually means that it was deleted or not created
+			// In this way, we will stop the reconciliation
+			log.Info("proxydef resource not found. Ignoring since object must be deleted")
+			return ctrl.Result{}, nil
+		}
+		// Error reading the object - requeue the request.
+		log.Error(err, "Failed to get proxydef")
+		return ctrl.Result{}, err
+	}
+
+	// Let's just set the status as Unknown when no status are available
+	if proxydef.Status.Conditions == nil || len(proxydef.Status.Conditions) == 0 {
+		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeAvailableproxydef, Status: metav1.ConditionUnknown, Reason: "Reconciling", Message: "Starting reconciliation"})
+		if err = r.Status().Update(ctx, proxydef); err != nil {
+			log.Error(err, "Failed to update proxydef status")
+			return ctrl.Result{}, err
+		}
+
+		// Let's re-fetch the proxydef Custom Resource after update the status
+		// so that we have the latest state of the resource on the cluster and we will avoid
+		// raise the issue "the object has been modified, please apply
+		// your changes to the latest version and try again" which would re-trigger the reconciliation
+		// if we try to update it again in the following operations
+		if err := r.Get(ctx, req.NamespacedName, proxydef); err != nil {
+			log.Error(err, "Failed to re-fetch proxydef")
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -61,6 +94,5 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 func (r *ProxyDefReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&proxyv1alpha1.ProxyDef{}).
-		Owns(&corev1.Pod{}).
 		Complete(r)
 }
