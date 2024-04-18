@@ -8,9 +8,10 @@ spec:
     strategy: Webhook
     webhook:
       clientConfig:
+        caBundle: ""
         service:
           namespace: system
-          name: webhook-service
+          name: proxius-webhook-service
           path: /convert
       conversionReviewVersions:
       - v1
