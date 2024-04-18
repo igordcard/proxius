@@ -92,6 +92,35 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		}
 	}
 
+	// Check if ConfigMap already exists:
+	configMap := &corev1.ConfigMap{}
+	err = r.Get(ctx, client.ObjectKey{Namespace: proxydef.Namespace, Name: proxydef.Name + "-config"}, configMap)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			// If the ConfigMap is not found, let's create it
+			return r.createConfigMap(ctx, proxydef)
+		}
+		// Error reading the object - requeue the request.
+		log.Error(err, "Failed to get ConfigMap")
+		return ctrl.Result{}, err
+	}
+
+	// The following are a few possible return options for a Reconciler:
+	// With the error:
+	// 		return ctrl.Result{}, err
+	// Without an error:
+	// 		return ctrl.Result{Requeue: true}, nil
+	// Therefore, to stop the Reconcile, use:
+	// 		return ctrl.Result{}, nil
+	// Reconcile again after X time:
+	//  	return ctrl.Result{RequeueAfter: 5 * time.Minute}, nil
+
+	return ctrl.Result{}, nil
+}
+
+func (r *ProxyDefReconciler) createConfigMap(ctx context.Context, proxydef *v1alpha1.ProxyDef) (ctrl.Result, error) {
+	log := log.FromContext(ctx)
+
 	// Let's create a ConfigMap in the same namespace based on the contents of the ProxyDef
 	configMap := &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{
@@ -115,7 +144,7 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if err := r.Create(ctx, configMap); err != nil {
 		log.Error(err, "Failed to create ConfigMap")
 		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeDegradedProxyDef, Status: metav1.ConditionFalse, Reason: "ConfigMapCreationFailed", Message: "Failed to create ConfigMap"})
-		if err = r.Status().Update(ctx, proxydef); err != nil {
+		if err := r.Status().Update(ctx, proxydef); err != nil {
 			log.Error(err, "Failed to update proxydef status")
 			return ctrl.Result{}, err
 		}
@@ -123,22 +152,12 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 	// Let's set the status as Ready when the ConfigMap is created
 	meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeReadyProxyDef, Status: metav1.ConditionTrue, Reason: "ConfigMapCreated", Message: "ConfigMap created successfully"})
-	if err = r.Status().Update(ctx, proxydef); err != nil {
+	if err := r.Status().Update(ctx, proxydef); err != nil {
 		log.Error(err, "Failed to update proxydef status")
 		return ctrl.Result{}, err
 	}
 
 	log.Info("ConfigMap created successfully")
-
-	// The following are a few possible return options for a Reconciler:
-	// With the error:
-	// 		return ctrl.Result{}, err
-	// Without an error:
-	// 		return ctrl.Result{Requeue: true}, nil
-	// Therefore, to stop the Reconcile, use:
-	// 		return ctrl.Result{}, nil
-	// Reconcile again after X time:
-	//  	return ctrl.Result{RequeueAfter: 5 * time.Minute}, nil
 
 	return ctrl.Result{}, nil
 }
