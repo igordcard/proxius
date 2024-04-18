@@ -22,7 +22,7 @@ make docker-build docker-push IMG=<some-registry>/proxius:tag
 Examples:
 ```sh
 make docker-build docker-push
-make docker-build docker-push IMG=localhost:5000/proxius:v0.1.0
+make docker-build docker-push IMG=localhost:5000/proxius:latest
 ```
 
 **NOTE:** This image ought to be published in the personal registry you specified. 
@@ -45,7 +45,7 @@ make deploy IMG=<some-registry>/proxius:tag
 
 Example:
 ```sh
-make deploy IMG=172.17.0.1:5000/proxius:v0.1.0
+make deploy IMG=172.17.0.1:5000/proxius:latest
 ```
 
 > **NOTE**: If you encounter RBAC errors, you may need to grant yourself cluster-admin 

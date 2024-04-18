@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: 172.17.0.1:5000/proxius
-  newTag: v0.1.0
+  newTag: latest

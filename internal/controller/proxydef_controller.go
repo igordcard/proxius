@@ -19,6 +19,7 @@ package controller
 import (
 	"context"
 
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -89,6 +90,44 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			return ctrl.Result{}, err
 		}
 	}
+
+	// Let's create a ConfigMap in the same namespace based on the contents of the ProxyDef
+	configMap := &corev1.ConfigMap{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        proxydef.Name + "-config",
+			Namespace:   proxydef.Namespace,
+			Labels:      proxydef.Labels,
+			Annotations: proxydef.Annotations,
+			OwnerReferences: []metav1.OwnerReference{
+				*metav1.NewControllerRef(proxydef, proxyv1alpha1.GroupVersion.WithKind("ProxyDef")),
+			},
+		},
+		Data: map[string]string{
+			"HTTP_PROXY":  proxydef.Spec.HTTPProxy,
+			"http_proxy":  proxydef.Spec.HTTPProxy,
+			"HTTPS_PROXY": proxydef.Spec.HTTPSProxy,
+			"https_proxy": proxydef.Spec.HTTPSProxy,
+			"NO_PROXY":    proxydef.Spec.NoProxy,
+			"no_proxy":    proxydef.Spec.NoProxy,
+		},
+	}
+	if err := r.Create(ctx, configMap); err != nil {
+		log.Error(err, "Failed to create ConfigMap")
+		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeDegradedProxyDef, Status: metav1.ConditionFalse, Reason: "ConfigMapCreationFailed", Message: "Failed to create ConfigMap"})
+		if err = r.Status().Update(ctx, proxydef); err != nil {
+			log.Error(err, "Failed to update proxydef status")
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, err
+	}
+	// Let's set the status as Ready when the ConfigMap is created
+	meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeReadyProxyDef, Status: metav1.ConditionTrue, Reason: "ConfigMapCreated", Message: "ConfigMap created successfully"})
+	if err = r.Status().Update(ctx, proxydef); err != nil {
+		log.Error(err, "Failed to update proxydef status")
+		return ctrl.Result{}, err
+	}
+
+	log.Info("ConfigMap created successfully")
 
 	// The following are a few possible return options for a Reconciler:
 	// With the error:
