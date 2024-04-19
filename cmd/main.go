@@ -149,15 +149,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err := builder.WebhookManagedBy(mgr).
-			For(&corev1.Pod{}).
-			WithDefaulter(&podAnnotator{}).
-			Complete(); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
-			os.Exit(1)
-		}
+	// if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+	if err := builder.WebhookManagedBy(mgr).
+		For(&corev1.Pod{}).
+		WithDefaulter(&podAnnotator{}).
+		Complete(); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
+		os.Exit(1)
 	}
+	// }
 
 	// mgr.GetWebhookServer().Register("/mutate-v1-pod", &webhook.Admission{
 	// 	Handler: &podAnnotator{
