@@ -19,11 +19,9 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -45,12 +43,12 @@ func (a *PodMutator) Handle(ctx context.Context, req admission.Request) admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	// TODO: figure out configmap dynamically from proxydef
+	// TODO: figure out configmap name dynamically from proxydef
 	for i := range pod.Spec.Containers {
 		pod.Spec.Containers[i].EnvFrom = append(pod.Spec.Containers[i].EnvFrom, corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "proxydef-sample-config",
+					Name: "proxydef-config",
 				},
 			},
 		})
@@ -62,21 +60,6 @@ func (a *PodMutator) Handle(ctx context.Context, req admission.Request) admissio
 		return admission.Errored(http.StatusConflict, err)
 	}
 
+	log.Info("Patching Pod with proxy environment", "err", nil)
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
-}
-
-func (a *PodMutator) Default(ctx context.Context, obj runtime.Object) error {
-	log := logf.FromContext(ctx)
-	pod, ok := obj.(*corev1.Pod)
-	if !ok {
-		return fmt.Errorf("expected a Pod but got a %T", obj)
-	}
-
-	if pod.Annotations == nil {
-		pod.Annotations = map[string]string{}
-	}
-	pod.Annotations["example-mutating-admission-webhook"] = "foo"
-	log.Info("Annotated Pod")
-
-	return nil
 }

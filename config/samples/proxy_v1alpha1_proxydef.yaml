@@ -7,8 +7,7 @@ metadata:
     app.kubernetes.io/part-of: proxius
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: proxius
-  name: proxydef-sample
-  namespace: default
+  name: proxydef
 spec:
   httpProxy: "http://proxy-us.intel.com:912"
   httpsProxy: "http://proxy-us.intel.com:912"
