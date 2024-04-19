@@ -11,4 +11,4 @@ metadata:
 spec:
   httpProxy: "http://proxy-us.intel.com:912"
   httpsProxy: "http://proxy-us.intel.com:912"
-  noProxy: "localhost,127.0.0.1,.intel.com,.svc,.local,.cluster,10.0.0.0/16,192.168.0.0/16,172.17.0.1"
+  noProxy: "localhost,127.0.0.1,.intel.com,.svc,.local,.cluster,.local.,10.0.0.0/8,192.168.0.0/16,172.17.0.1"
