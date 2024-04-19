@@ -34,9 +34,14 @@ spec:
           spec:
             description: ProxyDefSpec defines the desired state of ProxyDef
             properties:
+              allProxy:
+                description: 'TODO: Not implemented yet'
+                type: string
               autoDetect:
+                description: 'TODO: Not implemented yet'
                 type: boolean
               ftpProxy:
+                description: 'TODO: Not implemented yet'
                 type: string
               httpProxy:
                 type: string
@@ -48,16 +53,22 @@ spec:
                 description: 'TODO: Not implemented yet'
                 type: string
               nonProxyHosts:
+                description: 'TODO: Not implemented yet'
                 type: string
               proxyPassword:
+                description: 'TODO: Not implemented yet'
                 type: string
               proxyPort:
+                description: 'TODO: Not implemented yet'
                 type: integer
               proxyProtocol:
+                description: 'TODO: Not implemented yet'
                 type: string
               proxyUser:
+                description: 'TODO: Not implemented yet'
                 type: string
               socksProxy:
+                description: 'TODO: Not implemented yet'
                 type: string
             type: object
           status:

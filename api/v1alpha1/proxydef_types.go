@@ -32,15 +32,25 @@ type ProxyDefSpec struct {
 	NoProxy    string `json:"noProxy,omitempty"`
 
 	// TODO: Not implemented yet
-	NoProxyCIDRs  string `json:"noProxyCidrs,omitempty"`
-	SocksProxy    string `json:"socksProxy,omitempty"`
-	FTPProxy      string `json:"ftpProxy,omitempty"`
-	ProxyUser     string `json:"proxyUser,omitempty"`
+	AllProxy string `json:"allProxy,omitempty"`
+	// TODO: Not implemented yet
+	NoProxyCIDRs string `json:"noProxyCidrs,omitempty"`
+	// TODO: Not implemented yet
+	SocksProxy string `json:"socksProxy,omitempty"`
+	// TODO: Not implemented yet
+	FTPProxy string `json:"ftpProxy,omitempty"`
+	// TODO: Not implemented yet
+	ProxyUser string `json:"proxyUser,omitempty"`
+	// TODO: Not implemented yet
 	ProxyPassword string `json:"proxyPassword,omitempty"`
+	// TODO: Not implemented yet
 	ProxyProtocol string `json:"proxyProtocol,omitempty"`
-	ProxyPort     int    `json:"proxyPort,omitempty"`
+	// TODO: Not implemented yet
+	ProxyPort int `json:"proxyPort,omitempty"`
+	// TODO: Not implemented yet
 	NonProxyHosts string `json:"nonProxyHosts,omitempty"`
-	AutoDetect    bool   `json:"autoDetect,omitempty"`
+	// TODO: Not implemented yet
+	AutoDetect bool `json:"autoDetect,omitempty"`
 }
 
 // ProxyDefStatus defines the observed state of ProxyDef
