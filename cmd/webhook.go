@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"gomodules.xyz/jsonpatch/v2"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -46,11 +45,9 @@ func (a *PodMutator) Handle(ctx context.Context, req admission.Request) admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
-	mutatedPod := pod.DeepCopy()
-
 	// TODO: figure out configmap dynamically from proxydef
-	for i := range mutatedPod.Spec.Containers {
-		mutatedPod.Spec.Containers[i].EnvFrom = append(mutatedPod.Spec.Containers[i].EnvFrom, corev1.EnvFromSource{
+	for i := range pod.Spec.Containers {
+		pod.Spec.Containers[i].EnvFrom = append(pod.Spec.Containers[i].EnvFrom, corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
 					Name: "proxydef-sample-config",
@@ -59,19 +56,13 @@ func (a *PodMutator) Handle(ctx context.Context, req admission.Request) admissio
 		})
 	}
 
-	// Just converting the modified Pod to the right format
-	originalPodJson, _ := json.Marshal(pod)
-	mutatedPodJson, _ := json.Marshal(mutatedPod)
-	patch, err := jsonpatch.CreatePatch(originalPodJson, mutatedPodJson)
+	marshaledPod, err := json.Marshal(pod)
 	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
-	}
-	patchBytes, err := json.Marshal(patch)
-	if err != nil {
-		return admission.Errored(http.StatusBadRequest, err)
+		log.Info("Failed to encode Pod", "err", err)
+		return admission.Errored(http.StatusConflict, err)
 	}
 
-	return admission.PatchResponseFromRaw(originalPodJson, patchBytes)
+	return admission.PatchResponseFromRaw(req.Object.Raw, marshaledPod)
 }
 
 func (a *PodMutator) Default(ctx context.Context, obj runtime.Object) error {
