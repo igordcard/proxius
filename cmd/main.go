@@ -23,18 +23,18 @@ import (
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
-	corev1 "k8s.io/api/core/v1"
+
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
 	proxyv1alpha1 "github.com/igordcard/proxius/api/v1alpha1"
 	"github.com/igordcard/proxius/internal/controller"
@@ -150,21 +150,23 @@ func main() {
 	}
 
 	// if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-	if err := builder.WebhookManagedBy(mgr).
-		For(&corev1.Pod{}).
-		WithDefaulter(&podAnnotator{}).
-		Complete(); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
-		os.Exit(1)
-	}
+	// 	err = builder.WebhookManagedBy(mgr).
+	// 		For(&corev1.Pod{}).
+	// 		WithDefaulter(&podAnnotator{}).
+	// 		Complete()
+	// 	if err != nil {
+	// 		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
+	// 		os.Exit(1)
+	// 	}
 	// }
 
-	// mgr.GetWebhookServer().Register("/mutate-v1-pod", &webhook.Admission{
-	// 	Handler: &podAnnotator{
-	// 		Client:  mgr.GetClient(),
-	// 		decoder: admission.NewDecoder(mgr.GetScheme()),
-	// 	},
-	// })
+	mgr.GetWebhookServer().Register("/mutate-v1-pod", &webhook.Admission{
+		Handler: &PodMutator{
+			Client:  mgr.GetClient(),
+			decoder: admission.NewDecoder(mgr.GetScheme()),
+		},
+	})
+
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
 		setupLog.Error(err, "problem running manager")
