@@ -77,7 +77,7 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if proxydef.Status.Conditions == nil || len(proxydef.Status.Conditions) == 0 {
 		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeSyncingProxyDef, Status: metav1.ConditionUnknown, Reason: "Reconciling", Message: "Starting reconciliation"})
 		if err = r.Status().Update(ctx, proxydef); err != nil {
-			log.Error(err, "Failed to update proxydef status")
+			log.Error(err, "Failed to update proxydef status (to Syncing)")
 			return ctrl.Result{}, err
 		}
 
@@ -98,7 +98,7 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			// If the ConfigMap is not found, let's create it
-			return r.createConfigMap(ctx, proxydef)
+			return r.createConfigMap(ctx, proxydef, req)
 		}
 		// Error reading the object - requeue the request.
 		log.Error(err, "Failed to get ConfigMap")
@@ -118,7 +118,7 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	return ctrl.Result{}, nil
 }
 
-func (r *ProxyDefReconciler) createConfigMap(ctx context.Context, proxydef *v1alpha1.ProxyDef) (ctrl.Result, error) {
+func (r *ProxyDefReconciler) createConfigMap(ctx context.Context, proxydef *v1alpha1.ProxyDef, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
 	// Let's create a ConfigMap in the same namespace based on the contents of the ProxyDef
@@ -145,7 +145,7 @@ func (r *ProxyDefReconciler) createConfigMap(ctx context.Context, proxydef *v1al
 		log.Error(err, "Failed to create ConfigMap")
 		meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeDegradedProxyDef, Status: metav1.ConditionFalse, Reason: "ConfigMapCreationFailed", Message: "Failed to create ConfigMap"})
 		if err := r.Status().Update(ctx, proxydef); err != nil {
-			log.Error(err, "Failed to update proxydef status")
+			log.Error(err, "Failed to update proxydef status (to Degraded)")
 			return ctrl.Result{}, err
 		}
 		return ctrl.Result{}, err
@@ -153,7 +153,13 @@ func (r *ProxyDefReconciler) createConfigMap(ctx context.Context, proxydef *v1al
 	// Let's set the status as Ready when the ConfigMap is created
 	meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeReadyProxyDef, Status: metav1.ConditionTrue, Reason: "ConfigMapCreated", Message: "ConfigMap created successfully"})
 	if err := r.Status().Update(ctx, proxydef); err != nil {
-		log.Error(err, "Failed to update proxydef status")
+		log.Error(err, "Failed to update proxydef status (to Ready)")
+		return ctrl.Result{}, err
+	}
+
+	// re-fetch to avoid "object modified" issue
+	if err := r.Get(ctx, req.NamespacedName, proxydef); err != nil {
+		log.Error(err, "Failed to re-fetch proxydef")
 		return ctrl.Result{}, err
 	}
 
