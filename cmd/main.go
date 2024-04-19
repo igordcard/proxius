@@ -132,12 +132,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "ProxyDef")
 		os.Exit(1)
 	}
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&proxyv1alpha1.ProxyDef{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "ProxyDef")
-			os.Exit(1)
-		}
-	}
+	// if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+	// 	if err = (&proxyv1alpha1.ProxyDef{}).SetupWebhookWithManager(mgr); err != nil {
+	// 		setupLog.Error(err, "unable to create webhook", "webhook", "ProxyDef")
+	// 		os.Exit(1)
+	// 	}
+	// }
 	//+kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
@@ -149,12 +149,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err := builder.WebhookManagedBy(mgr).
-		For(&corev1.Pod{}).
-		WithDefaulter(&podAnnotator{}).
-		Complete(); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
-		os.Exit(1)
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		if err := builder.WebhookManagedBy(mgr).
+			For(&corev1.Pod{}).
+			WithDefaulter(&podAnnotator{}).
+			Complete(); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "Pod")
+			os.Exit(1)
+		}
 	}
 
 	// mgr.GetWebhookServer().Register("/mutate-v1-pod", &webhook.Admission{
