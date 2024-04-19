@@ -10,26 +10,6 @@ webhooks:
     service:
       name: webhook-service
       namespace: system
-      path: /mutate-proxy-igordc-com-v1alpha1-proxydef
-  failurePolicy: Fail
-  name: mproxydef.kb.io
-  rules:
-  - apiGroups:
-    - proxy.igordc.com
-    apiVersions:
-    - v1alpha1
-    operations:
-    - CREATE
-    - UPDATE
-    resources:
-    - proxydefs
-  sideEffects: None
-- admissionReviewVersions:
-  - v1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
       path: /mutate-v1-pod
   failurePolicy: Fail
   name: mpod.kb.io

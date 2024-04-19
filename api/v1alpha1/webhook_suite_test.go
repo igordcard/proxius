@@ -113,8 +113,10 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&ProxyDef{}).SetupWebhookWithManager(mgr)
-	Expect(err).NotTo(HaveOccurred())
+	// err = (&ProxyDef{}).SetupWebhookWithManager(mgr)
+	// Expect(err).NotTo(HaveOccurred())
+
+	// TODO: test for Pod webhook
 
 	//+kubebuilder:scaffold:webhook
 
