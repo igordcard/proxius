@@ -1,0 +1,54 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: proxius.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: ProxyDef is the Schema for the proxydefs API
+      displayName: Proxy Def
+      kind: ProxyDef
+      name: proxydefs.proxy.igordc.com
+      statusDescriptors:
+      - description: Conditions store the status conditions of the ProxyDef instances
+        displayName: Conditions
+        path: conditions
+      version: v1alpha1
+  description: Automatic proxy environment injection
+  displayName: proxius
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - proxy
+  - corporate
+  - networking
+  links:
+  - name: Proxius
+    url: https://proxius.domain
+  maintainers:
+  - email: igordcard+proxius@gmail.com
+    name: igordc
+  maturity: alpha
+  provider:
+    name: igordc
+    url: igordc.com
+  version: 0.0.0

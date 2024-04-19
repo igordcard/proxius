@@ -4,5 +4,5 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 images:
 - name: controller
-  newName: 172.17.0.1:5000/proxius
+  newName: localhost:5000/proxius
   newTag: latest
