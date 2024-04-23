@@ -60,6 +60,10 @@ kubectl apply -k config/samples/
 
 >**NOTE**: Ensure that the samples has default values to test it out.
 
+### To Publish
+
+See `research/` repo for the publishing steps.
+
 ### To Uninstall
 **Delete the instances (CRs) from the cluster:**
 
