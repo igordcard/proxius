@@ -57,7 +57,7 @@ type ProxyDefReconciler struct {
 func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := log.FromContext(ctx)
 
-	log.Info("proxydef resource request detected")
+	log.Info("ProxyDef resource request detected")
 
 	proxydef := &v1alpha1.ProxyDef{}
 	err := r.Get(ctx, req.NamespacedName, proxydef)
@@ -65,11 +65,11 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		if apierrors.IsNotFound(err) {
 			// If the custom resource is not found then, it usually means that it was deleted or not created
 			// In this way, we will stop the reconciliation
-			log.Info("proxydef resource not found. Ignoring since object must be deleted")
+			log.Info("ProxyDef resource not found. Ignoring since object must be deleted")
 			return ctrl.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
-		log.Error(err, "Failed to get proxydef")
+		log.Error(err, "Failed to get ProxyDef resource")
 		return ctrl.Result{}, err
 	}
 
@@ -87,7 +87,7 @@ func (r *ProxyDefReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		// the latest version and try again" which would re-trigger the reconciliation
 		// if we try to update it again in the following operations
 		if err := r.Get(ctx, req.NamespacedName, proxydef); err != nil {
-			log.Error(err, "Failed to re-fetch proxydef")
+			log.Error(err, "Failed to re-fetch ProxyDef")
 			return ctrl.Result{}, err
 		}
 	}
@@ -153,13 +153,13 @@ func (r *ProxyDefReconciler) createConfigMap(ctx context.Context, proxydef *v1al
 	// Let's set the status as Ready when the ConfigMap is created
 	meta.SetStatusCondition(&proxydef.Status.Conditions, metav1.Condition{Type: typeReadyProxyDef, Status: metav1.ConditionTrue, Reason: "ConfigMapCreated", Message: "ConfigMap created successfully"})
 	if err := r.Status().Update(ctx, proxydef); err != nil {
-		log.Error(err, "Failed to update proxydef status (to Ready)")
+		log.Error(err, "Failed to update ProxyDef status (to Ready)")
 		return ctrl.Result{}, err
 	}
 
 	// re-fetch to avoid "object modified" issue
 	if err := r.Get(ctx, req.NamespacedName, proxydef); err != nil {
-		log.Error(err, "Failed to re-fetch proxydef")
+		log.Error(err, "Failed to re-fetch ProxyDef resource")
 		return ctrl.Result{}, err
 	}
 

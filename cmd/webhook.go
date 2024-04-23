@@ -22,10 +22,12 @@ import (
 	"net/http"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+
+	proxyv1alpha1 "github.com/igordcard/proxius/api/v1alpha1"
 )
 
 //+kubebuilder:webhook:path=/mutate-v1-pod,mutating=true,failurePolicy=fail,groups="",resources=pods,verbs=create;update,versions=v1,name=mpod.kb.io,admissionReviewVersions=v1,sideEffects=NoneOnDryRun
@@ -43,12 +45,28 @@ func (a *PodMutator) Handle(ctx context.Context, req admission.Request) admissio
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	// Get the ProxyDef resource
+	proxyDef := &proxyv1alpha1.ProxyDef{}
+	if err := a.Client.Get(ctx, client.ObjectKey{Namespace: req.Namespace, Name: "proxydef"}, proxyDef); err != nil {
+		if errors.IsNotFound(err) {
+			// The ProxyDef resource does not exist, handle it here
+			log.Info("ProxyDef resource does not exist, skipping")
+			return admission.Allowed("ProxyDef resource does not exist")
+		} else {
+			// Some other error occurred when trying to get the ProxyDef resource
+			log.Info("Failed to get ProxyDef resource", "err", err)
+			return admission.Errored(http.StatusInternalServerError, err)
+		}
+	}
+
 	// TODO: figure out configmap name dynamically from proxydef
+	proxydefConfigmap := "proxydef-config"
+
 	for i := range pod.Spec.Containers {
 		pod.Spec.Containers[i].EnvFrom = append(pod.Spec.Containers[i].EnvFrom, corev1.EnvFromSource{
 			ConfigMapRef: &corev1.ConfigMapEnvSource{
 				LocalObjectReference: corev1.LocalObjectReference{
-					Name: "proxydef-config",
+					Name: proxydefConfigmap,
 				},
 			},
 		})
