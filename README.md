@@ -1,8 +1,5 @@
 # proxius
-// TODO(user): Add simple overview of use/purpose
-
-## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+Proxius is a K8s controller which makes it easy-peasy to automatically inject proxy environment variables across deployed pods.
 
 ## Getting Started
 
@@ -77,18 +74,11 @@ kubectl delete -k config/samples/
 make uninstall
 ```
 
-**UnDeploy the controller from the cluster:**
+**Undeploy the controller from the cluster:**
 
 ```sh
 make undeploy
 ```
-
-## Contributing
-// TODO(user): Add detailed information on how you would like others to contribute to this project
-
-**NOTE:** Run `make help` for more information on all potential `make` targets
-
-More information can be found via the [Kubebuilder Documentation](https://book.kubebuilder.io/introduction.html)
 
 ## License
 
